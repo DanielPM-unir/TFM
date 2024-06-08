@@ -1,22 +1,16 @@
+
+import Scraper
+import requests
+
 def main():
-    print ("""              _
-             | |
-             | |===( )   //////
-             |_|   |||  | o o|
-                    ||| ( c  )                  ____
-                     ||| \= /                  ||   \_
-                      ||||||                   ||     |
-                      ||||||                ...||__/|-"
-                      ||||||             __|________|__
-                        |||             |______________|
-                        |||             || ||      || ||
-                        |||             || ||      || ||
-------------------------|||-------------||-||------||-||-------
-                        |__>            || ||      || ||
+    print ("esto no puede estar vacio")
 
 
-     hit any key to continue""")
-
-
-if __name__ == main:
-    main()
+if __name__ == "__main__":
+  print("Tu IP es :")
+  print(" ")
+  api = "http://ip-api.com/json/"
+  petición = requests.get(api)
+  print(petición.text)
+  print()
+  #Scraper.Scraper()
