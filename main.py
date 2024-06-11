@@ -1,6 +1,22 @@
 
 import Scraper
-import requests
+import requests #esta para hacer peticiones a red.
+import csv
+import time
+import bs4
+from bs4 import BeautifulSoup
+
+userAgents = [
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.3'
+]
+
+diccionario.csv
+sesion
+  proxy
+  userAgents
+  respuesta = get(url.(query))
+  respuesta(html5lib)
+  
 
 def main():
     print ("esto no puede estar vacio")
