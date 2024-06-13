@@ -7,32 +7,31 @@ from urllib.error import URLError, HTTPError
 from bs4 import BeautifulSoup
 
 class Crawler:
-    def __init__(self,nombreweb,url,profundidad, retardo, verbose, logs, rutasalida):
-        self.nombreweb = nombreweb
-        self.url = url
+    def __init__(self,sitioweb,profundidad, retardo, verbose, log, ruta_salida):
+        self.sitioweb = sitioweb
         self.profundidad = profundidad
         self.retardo = retardo
-        self.rutasalida = rutasalida
+        self.ruta_salida = ruta_salida
         self.verbose = verbose
-        self.logs = logs
+        self.log = log
         
 
 
     def estandarización(self, url):
 
-        if url.startswith(self.nombreweb):   #mirar funcion starts with
+        if url.startswith(self.sitioweb):   #mirar funcion starts with
             return url
         elif url.startswith('/'):
-            if self.nombreweb[-1] == '/':
-                url_final = self.nombreweb [:-1] + url
+            if self.sitioweb[-1] == '/':
+                url_final = self.sitioweb [:-1] + url
             else:
-                url_final = self.nombreweb + url
+                url_final = self.sitioweb + url
             return url_final
         elif re.search('^.*\\.(html|htm|aspx|php|doc|css|js|less)$', url, re.IGNORECASE):
-            if self.nombreweb[-1] == '/':
-                url_final = self.nombreweb + url
+            if self.sitioweb[-1] == '/':
+                url_final = self.sitioweb + url
             else:
-                url_final = self.nombreweb + "/" + url
+                url_final = self.sitioweb + "/" + url
             return url_final
         
 
@@ -43,11 +42,11 @@ class Crawler:
         #queremos que nos retorne una lista de los links que encuentra -> lo tenemos que escalar a la bbdd.
         lista = set()
         lista_limpia = []
-        lista_limpia.insert(0,self.nombreweb)
+        lista_limpia.insert(0,self.sitioweb)
         lista_limpia_indice = 0
-        ruta_log = self.rutasalida + '/log.txt'
+        ruta_log = self.ruta_salida + '/log.txt'
 
-        print(f" El crawler está activo en el sitio {self.nombreweb} con la profundidad {self.profundidad} y {self.retardo} segundos de delay.")
+        print(f" El crawler está activo en el sitio {self.sitioweb} con la profundidad {self.profundidad} y {self.retardo} segundos de delay.")
 
         #definir profundidad
 
@@ -66,7 +65,7 @@ class Crawler:
                         continue
                 else:
                     try:
-                        pagina_html = urllib.request.urlopen(self.nombreweb)
+                        pagina_html = urllib.request.urlopen(self.sitioweb)
                         lista_limpia_indice += 1
                     except(HTTPError, URLError) as error:
                         print(f"Error al intentar acceder a la página, para ver el error, por favor, ejecuta el modo -v verbose.")
@@ -108,7 +107,7 @@ class Crawler:
                     time.sleep(float(self.retardo))
 
                 #logs    
-                if self.logs:
+                if self.log:
                     codigo_respuesta = pagina_html.getcode() 
                     with open(ruta_log, 'w+', encoding='UTF-8') as archivo_log:
                         archivo_log.write(f"[{str(codigo_respuesta)}] {str(item)} \n")
