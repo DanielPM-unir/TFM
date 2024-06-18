@@ -11,7 +11,7 @@ class Crawler:
         self.sitioweb = sitioweb
         self.profundidad = profundidad
         self.retardo = retardo
-        self.ruta_salida = ruta_salida
+        self.ruta_salida = str(ruta_salida)
         self.verbose = verbose
         self.log = log
         
@@ -44,7 +44,10 @@ class Crawler:
         lista_limpia = []
         lista_limpia.insert(0,self.sitioweb)
         lista_limpia_indice = 0
-        ruta_log = self.ruta_salida + '/log.txt'
+        if isinstance(self.ruta_salida, str):
+            ruta_log = self.ruta_salida + '/log.txt'
+        else:
+            print("Error: ruta_salida no está definida correctamente como una cadena.")
 
         print(f" El crawler está activo en el sitio {self.sitioweb} con la profundidad {self.profundidad} y {self.retardo} segundos de delay.")
 

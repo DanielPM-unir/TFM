@@ -39,54 +39,49 @@ def check_yara(raw=None, yara=0):
         return matches
 
 
-def cinex(archivo_entrda, ruta_salida, yara=None):
-    file = io.TextIOWrapper
+def cinex(archivo_entrada, ruta_salida, yara=None):
+    file = None
     try:
-        file = open(archivo_entrda, 'r')
+        file = open(archivo_entrada, 'r', encoding='utf-8')  # Abre el archivo en modo lectura
     except IOError as err:
-        print(f"Error: {err}\n No se puede abrir el archivo: {archivo_entrda}")
+        print(f"Error: {err}\n No se puede abrir el archivo: {archivo_entrada}")
+        return  # Salir de la función si hay un error al abrir el archivo
 
     for line in file:
-
-        # Generate the name for every file.
         try:
-            page_name = line.rsplit('/', 1)
-            cl_page_name = str(page_name[1])
-            cl_page_name = cl_page_name[:-1]
-            if len(cl_page_name) == 0:
-                archivo_salida = "index.htm"
+            line = line.strip()  # Eliminar espacios en blanco al inicio y al final de la línea
+            page_name = line.rsplit('/', 1)[-1]  # Obtener el nombre del archivo de la URL
+
+            if not page_name:  # Si no hay nombre de archivo válido, usar "index.html"
+                archivo_salida = "index.html"
             else:
-                archivo_salida = cl_page_name
-        except IndexError as error:
-            print(f"Error: {error}")
-            continue
+                archivo_salida = page_name
 
-        # Extraer página a archivo.
-        try:
             content = urllib.request.urlopen(line, timeout=10).read()
 
             if yara is not None:
                 full_match_keywords = check_yara(content, yara)
 
-                if len(full_match_keywords) == 0:
+                if not full_match_keywords:
                     print('No hay ningún match.')
                     continue
 
-            with open(ruta_salida + "/" + archivo_salida, 'wb') as results:
+            with open(os.path.join(ruta_salida, archivo_salida), 'wb') as results:
                 results.write(content)
-            print(f"Archivo creado en: {os.getcwd()}/{ruta_salida}/{archivo_salida}")
+            print(f"Archivo creado en: {os.path.join(ruta_salida, archivo_salida)}")
+        
         except HTTPError as e:
             print(f"Cinex Error: {e.code}, No se puede acceder a : {e.url}")
             continue
-        except InvalidURL as e:
-            print(f" URL inválida: {line} \n Omitiendo...")
-            continue
-        except IncompleteRead as e:
-            print(f"Lectura incompleta en la línea: {line}")
+        except URLError as e:
+            print(f"Cinex Error: No se puede acceder a : {line}")
             continue
         except IOError as err:
             print(f"Error: {err}\n No se pudo escribir en el archivo de salida: {archivo_salida}")
-    file.close()
+            continue
+
+    if file:
+        file.close()  # Cerrar el archivo al finalizar la función
 
 
 def intermex(archivo_entrada, yara):

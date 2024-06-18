@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """
-TorCrawl.py is a python script to crawl and extract (regular or onion)
-webpages through TOR network.
+TorCrawl.py es un script de Python para rastrear y extraer (webpages regulares o onion)
+a través de la red TOR.
 
 usage: python torcrawl.py [options]
 python torcrawl.py -u l0r3m1p5umD0lorS1t4m3t.onion
@@ -10,34 +10,33 @@ python torcrawl.py -v -u l0r3m1p5umD0lorS1t4m3t.onion -c -d 2 -p 5
 python torcrawl.py -v -w -u http://www.github.com -c -d 2 -p 5 -e -f GitHub
 
 General:
--h, --help         : Help
--v, --verbose      : Show more informations about the progress
--u, --url *.onion  : URL of Webpage to crawl or extract
--w, --without      : Without the use of Relay TOR
+-h, --help         : Ayuda
+-v, --verbose      : Mostrar más información sobre el progreso
+-u, --url *.onion  : URL de la página web para rastrear o extraer
+-w, --without      : Sin el uso de Relay TOR
 
 Extract:
--e, --extract           : Extract page's code to terminal or file.
-                          (Defualt: terminal)
--i, --input filename    : Input file with URL(s) (seperated by line)
--o, --output [filename] : Output page(s) to file(s) (for one page)
--y, --yara              : Yara keyword search page categorisation
-                            read in from /res folder. 
-                            'h' search whole html object.
-                            't' search only the text.
+-e, --extract           : Extraer el código de la página a la terminal o archivo.
+                          (Por defecto: terminal)
+-i, --input filename    : Archivo de entrada con URL(s) (separados por línea)
+-o, --output [filename] : Salida de la(s) página(s) a archivo(s) (para una página)
+-y, --yara              : Búsqueda de palabras clave con Yara para la categorización de páginas
+                            leídas desde la carpeta /res. 
+                            'h' busca en todo el objeto html.
+                            't' busca solo en el texto.
 
 Crawl:
--c, --crawl       : Crawl website (Default output on /links.txt)
--d, --cdepth      : Set depth of crawl's travel (Default: 1)
--z, --exclusions  : Paths that you don't want to include (TODO)
--s, --simultaneous: How many pages to visit at the same time (TODO)
--p, --pause       : The length of time the crawler will pause
-                    (Default: 0)
--f, --folder	  : The root directory which will contain the
-                    generated files
--l, --log         : Log file with visited URLs and their response code.
+-c, --crawl       : Rastrea el sitio web (Salida por defecto en /links.txt)
+-d, --cdepth      : Establecer profundidad del rastreo (Por defecto: 1)
+-z, --exclusions  : Rutas que no deseas incluir (TODO)
+-s, --simultaneous: Cuántas páginas visitar al mismo tiempo (TODO)
+-p, --pause       : La duración de la pausa del rastreador entre páginas.
+                    (Por defecto: 0)
+-f, --folder      : El directorio raíz que contendrá los archivos generados
+-l, --log         : Archivo log con las URLs visitadas y su código de respuesta.
 
 GitHub: github.com/MikeMeliz/TorCrawl.py
-License: GNU General Public License v3.0
+Licencia: GNU General Public License v3.0
 
 """
 
@@ -47,31 +46,29 @@ import socket
 import sys
 import datetime
 
-import socks  # noqa - pysocks hay que hacer pip install
+import socks  # pysocks necesita instalación con pip install pysocks
 
 from Conexiones import devuelve_ip
 from Conexiones import tor_corriendo
 from Conexiones import extraer_dominio
 from Conexiones import carpeta_salida
 from Conexiones import url_estandarización
-# TorCrawl Modules
+# Módulos de TorCrawl
 from Crawler import Crawler
 from Scraper import scraper
 
 
-# Set socket and connection with TOR network
+# Configurar el socket y la conexión con la red TOR
 def connect_tor():
-
     try:
         port = 9050
-        # Set socks proxy and wrap the urllib module
+        # Configurar el proxy de socks y envolver el módulo urllib
         socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, '127.0.0.1', port)
         socket.socket = socks.socksocket
 
-        # Perform DNS resolution through the socket
+        # Realizar resolución DNS a través del socket
         def getaddrinfo(*args):  # noqa
-            return [(socket.AF_INET, socket.SOCK_STREAM, 6, '',
-                     (args[0], args[1]))]
+            return [(socket.AF_INET, socket.SOCK_STREAM, 6, '', (args[0], args[1]))]
 
         socket.getaddrinfo = getaddrinfo  # noqa
     except socks.HTTPError as err:
@@ -80,9 +77,9 @@ def connect_tor():
 
 
 def main():
-    # Get arguments with argparse.
+    # Obtener argumentos con argparse.
     parser = argparse.ArgumentParser(
-        description="Este buscadores un script de python que nos permite crawlear y scrapear datos de TOR o la red normal.")
+        description="Este buscador es un script de Python que nos permite rastrear y extraer datos de TOR o la red normal.")
 
     # General
     parser.add_argument(
@@ -126,23 +123,23 @@ def main():
         '-c',
         '--crawl',
         action='store_true',
-        help='Crawl sitioweb (Por defecto el archivo /links.txt)'
+        help='Rastrea el sitio web (Por defecto el archivo /links.txt)'
     )
     parser.add_argument(
         '-d',
         '--cdepth',
-        help='Establecer profundidad del crawler (Por defecto en: 1)'
+        help='Establecer profundidad del rastreador (Por defecto en: 1)'
     )
     parser.add_argument(
         '-p',
-        '--cpause',
-        help='Duración del retardo del crawler entre páginas.'
+        '--pause',
+        help='Duración del retardo del rastreador entre páginas.'
     )
     parser.add_argument(
         '-l',
         '--log',
         action='store_true',
-        help='Crea un archivo log en el que se ve las páginas que se han visitado con su código de respuesta'
+        help='Crea un archivo log en el que se ven las páginas que se han visitado con su código de respuesta'
     )
     parser.add_argument(
         '-f',
@@ -152,20 +149,20 @@ def main():
     parser.add_argument(
         '-y',
         '--yara',
-        help='Checkear por palabras y solo extrae documentos que contienen un match.\'h\' Busca en todos los objetos html. \'t\' Busca solo en el texto.'
+        help='Buscar palabras clave con Yara y solo extraer documentos que contienen un match.\'h\' Busca en todos los objetos html. \'t\' Busca solo en el texto.'
     )
 
     args = parser.parse_args()
 
-    # Parse arguments to variables else initiate variables.
-    archivo_entrada = args.entrada if args.entrada else ''
-    archivo_salida = args.salida if args.salida else ''
-    profundidad = args.profundidad if args.profundidad else 0
-    retardo = args.retardo if args.retardo else 1
+    # Parsear argumentos a variables o iniciar variables.
+    archivo_entrada = args.input if args.input else ''
+    archivo_salida = args.output if args.output else ''
+    profundidad = int(args.cdepth) if args.cdepth else 0
+    retardo = int(args.pause) if args.pause else 1
     yara_lista = args.yara if args.yara else None
 
-    # Connect to TOR
-    if args.without is False:
+    # Conectar a TOR
+    if not args.without:
         tor_corriendo(args.verbose)
         connect_tor()
 
@@ -176,17 +173,16 @@ def main():
     sitioweb = ''
     ruta_salida = ''
 
-    # Canonicalization of web url and create path for output.
+    # Canonicalización de la URL web y crear la ruta para la salida.
     if len(args.url) > 0:
         sitioweb = url_estandarización(args.url, args.verbose)
-        if args.carpeta is not None:
-            ruta_salida = carpeta_salida(args.carpeta, args.verbose)
+        if args.folder is not None:
+            ruta_salida = carpeta_salida(args.folder, args.verbose)
         else:
             ruta_salida = carpeta_salida(extraer_dominio(sitioweb), args.verbose)
 
     if args.crawl:
-        crawler = Crawler(sitioweb, profundidad, retardo, ruta_salida, args.log,
-                          args.verbose)
+        crawler = Crawler(sitioweb, profundidad, retardo, ruta_salida, args.log, args.verbose)
         lst = crawler.crawl()
 
         now = datetime.datetime.now().strftime("%Y%m%d")
@@ -197,11 +193,9 @@ def main():
 
         if args.extract:
             archivo_entrada = ruta_salida + "/links.txt"
-            scraper(sitioweb, args.crawl, archivo_salida, archivo_entrada, ruta_salida,
-                      yara_lista)
+            scraper(sitioweb, args.crawl, archivo_salida, archivo_entrada, ruta_salida, yara_lista)
     else:
-        scraper(sitioweb, args.crawl, archivo_salida, archivo_entrada, ruta_salida,
-                  yara_lista)
+        scraper(sitioweb, args.crawl, archivo_salida, archivo_entrada, ruta_salida, yara_lista)
 
 
 # Stub to call main method.
