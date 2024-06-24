@@ -1,0 +1,62 @@
+version: '1.0'
+
+services:
+  elasticsearch:
+    image: docker.io/elasticsearch:7.9.2
+    volumes:
+      - type: bind
+        source: ./elasticsearch/config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - type: volume
+        source: elasticsearch_vol
+        target: /usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: changeme
+      discovery.type: single-node
+    networks:
+      - elknet
+
+  logstash:
+    image: docker.io/logstash:7.9.2
+    volumes:
+      - type: bind
+        source: ./logstash/config/logstash.conf
+        target: /usr/share/logstash/pipeline/logstash.conf
+        read_only: true
+    ports:
+      - "5044:5044"
+      - "5000:5000/tcp"
+      - "5000:5000/udp"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - elknet
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.io/kibana:7.9.2
+    volumes:
+      - type: bind
+        source: ./kibana/config/kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    ports:
+      - "5601:5601"
+    networks:
+      - elknet
+    depends_on:
+      - elasticsearch
+
+networks:
+  elknet:
+    driver: bridge
+
+volumes:
+  elasticsearch_vol:
