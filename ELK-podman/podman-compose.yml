@@ -54,6 +54,13 @@ services:
     depends_on:
       - elasticsearch
 
+  crawler:
+    image: localhost/crawler:1.0.0
+    networks:
+     - elknet
+    depends_on:
+      - elasticsearch
+
 networks:
   elknet:
     driver: bridge

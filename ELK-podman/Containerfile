@@ -1,0 +1,7 @@
+FROM ubuntu:24.04
+
+COPY ./main /usr/local/bin/main
+
+RUN chmod +x /usr/local/bin/main
+
+ENTRYPOINT ["/usr/local/bin/main"]
